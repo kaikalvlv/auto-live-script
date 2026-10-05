@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>汽车直播话术生成器</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#f4f5f7;color:#171717}.wrap{max-width:1180px;margin:auto;padding:28px}.head{margin-bottom:22px}.head h1{font-size:30px;margin:0 0 7px}.head p{margin:0;color:#666}.grid{display:grid;grid-template-columns:390px 1fr;gap:20px}.card{background:#fff;border:1px solid #e8e8e8;border-radius:16px;padding:20px;box-shadow:0 4px 18px #00000008}.field{margin:0 0 15px}.field label{display:block;font-weight:650;font-size:14px;margin-bottom:7px}input,select,textarea{width:100%;border:1px solid #ddd;border-radius:9px;padding:11px 12px;font-size:14px;background:#fff}textarea{resize:vertical;min-height:95px}.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px}.check{border:1px solid #e5e5e5;border-radius:9px;padding:9px;font-size:13px}.check input{width:auto;margin-right:5px}.btns{display:flex;gap:9px;margin-top:18px}button{border:0;border-radius:9px;padding:11px 15px;font-weight:650;cursor:pointer}.primary{background:#111;color:#fff;flex:1}.secondary{background:#eee}.out{white-space:pre-wrap;line-height:1.85;font-size:15px;min-height:650px}.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.badge{font-size:12px;background:#f1f1f1;border-radius:99px;padding:5px 9px;color:#555}.hint{color:#999;padding-top:160px;text-align:center}.foot{font-size:12px;color:#888;margin-top:12px}@media(max-width:850px){.grid{grid-template-columns:1fr}.wrap{padding:15px}.out{min-height:400px}}
+</style>
+</head>
+<body><main class="wrap">
+<div class="head"><h1>汽车直播话术生成器</h1><p>输入品牌、车型和直播主题，快速生成可直接照读的直播结构与口语稿。</p></div>
+<div class="grid">
+<section class="card">
+<div class="field"><label>品牌</label><input id="brand" placeholder="例如：丰田 / 大众 / 比亚迪"></div>
+<div class="field"><label>车型</label><input id="model" placeholder="例如：凯美瑞、亚洲龙；可填写多个"></div>
+<div class="field"><label>直播时长</label><select id="duration"><option value="30">30 分钟</option><option value="60" selected>60 分钟</option><option value="90">90 分钟</option></select></div>
+<div class="field"><label>核心主题</label><textarea id="topic" placeholder="例如：10月行情、各价位怎么选、哪个版本最值得买、燃油和双擎怎么选"></textarea></div>
+<div class="field"><label>直播目标</label><div class="checks"><label class="check"><input type="checkbox" id="retain" checked>提高停留</label><label class="check"><input type="checkbox" id="comment" checked>评论互动</label><label class="check"><input type="checkbox" id="follow" checked>关注引导</label><label class="check"><input type="checkbox" id="lead" checked>自然留资</label></div></div>
+<div class="field"><label>补充素材 / 事实</label><textarea id="facts" placeholder="把车型配置、行情、文章笔记、你的原话粘贴进来。生成器优先使用这里的信息，不乱编价格。"></textarea></div>
+<div class="btns"><button class="primary" onclick="generate()">生成直播稿</button><button class="secondary" onclick="resetAll()">清空</button></div>
+<div class="foot">当前版本为本地规则生成，不需要 API Key。下一版可接入 AI 模型生成长篇完整话术。</div>
+</section>
+<section class="card"><div class="toolbar"><strong>生成结果</strong><div><span class="badge" id="count">0 字</span> <button class="secondary" onclick="copyText()">复制全文</button></div></div><div class="out" id="out"><div class="hint">填写左侧信息后点击“生成直播稿”</div></div></section>
+</div></main>
+<script>
+const $=id=>document.getElementById(id);
+function section(title,body){return `\n【${title}】\n${body}\n`}
+function generate(){
+ const b=$('brand').value.trim()||'这个品牌',m=$('model').value.trim()||'你正在看的车型',d=+$('duration').value,t=$('topic').value.trim()||'当前行情、车型怎么选、版本怎么选',f=$('facts').value.trim();
+ const goals=[]; if($('retain').checked)goals.push('停留');if($('comment').checked)goals.push('评论');if($('follow').checked)goals.push('关注');if($('lead').checked)goals.push('留资');
+ let s=`${b} ${m}｜${d}分钟直播照读稿\n目标：${goals.join(' / ')||'干货讲解'}\n主题：${t}\n`;
+ s+=section('开场 0-3分钟',`刚进直播间、最近准备看${b}的朋友先别急着划走。今天不跟大家念参数，我就解决几个真正影响你买车的问题：第一，${m}到底适合什么人；第二，现在选哪个版本更合理；第三，买之前哪些钱一定要算清楚。\n\n正在看${b}的，公屏打个“1”；已经看中具体车型的，直接把车型打出来，我按大家问得最多的往下讲。`);
+ s+=section('第一段：先给结论',`咱们先把结论放前面，直播间不绕弯子。今天围绕“${t}”讲。你先记住一个原则：买车不要只看指导价，也不要只看某一个所谓最低价，要把车型、配置、付款方式、置换条件和最终总成本放在同一套口径里比较。\n\n如果你现在就在纠结${m}，先别急着下决定，后面我会把适合人群、版本选择和费用拆开。`);
+ s+=section('第二段：车型怎么选',`选${b}的时候先看使用场景，不要反过来被配置表带着走。你每天通勤多少公里、家里几个人、城市开得多还是高速多、预算上限是多少，这四个问题先回答清楚。\n\n公屏可以直接按“预算+用途”发，比如“15万家用”“20万通勤”，这样我讲的时候你能马上对号入座。\n\n针对${m}：先判断空间和动力形式是否匹配，再比较版本差价买到了什么。多出来的钱如果只是你几乎不用的配置，就没必要为了所谓高配硬上。`);
+ s+=section('第三段：版本选择逻辑',`版本怎么选，我习惯按三层看。第一层是必须有的安全和日常配置；第二层是高频舒适配置；第三层才是低频锦上添花配置。\n\n所以不要问“最高配是不是最好”，要问“多花这笔钱值不值”。同一款车差一两万，真正要算的是新增配置里有多少是你每天都会用到的。\n\n你们把正在纠结的两个版本打在公屏，我就按这个逻辑给你拆。`);
+ if(f)s+=section('你提供的素材（优先依据）',`${f}\n\n上面这些属于本场已提供的信息。涉及实时价格、补贴和地方政策时，以实际查询和当地门店最终口径为准，不为了制造低价随意补数字。`);
+ s+=section('第四段：价格与落地费用',`价格这块最容易把人讲乱。统一拆成：裸车价、购置税、保险、上牌；如果是分期，再单独把利息和相关金融成本列出来；有置换和地方补贴，也要单独列，别混在“优惠”两个字里面。\n\n这样你去对比不同门店时，才能保证同车型、同配置、同付款方式比较总成本。只拿一个裸车价去比，很容易看着便宜，最后其他项目又加回来。`);
+ if($('lead').checked)s+=section('自然上链接 / 查询',`想知道自己城市${b} ${m}目前参考行情的，别只在公屏问“最低多少”。可以点直播间的小程序，先选品牌、车型、配置和城市，把查到的价格当作当地参考。\n\n查完之后把“城市+车型+配置+显示价格+全款还是分期+有没有置换”发出来，我后面讲价格的时候就能按同一个口径帮你拆。注意，页面价格是参考信息，不把它说成最终成交承诺。`);
+ s+=section('循环留人段',`刚进来的朋友，我再把今天这场直播讲什么说一遍：不念说明书，主要解决${b}怎么选、${m}哪个版本更合适，以及买车到底应该怎么比较总成本。\n\n已经听了一会儿觉得有用的可以点个关注，后面换车型的时候不用重新找。没听到前面的也不用急，我每隔一段都会把关键结论重新带一遍。`);
+ const blocks=d===30?1:d===60?2:3; for(let i=0;i<blocks;i++)s+=section(`第${i+1}轮互动深化`, `接下来我按公屏问题继续。优先回答三类：第一，两个车型怎么选；第二，同一车型两个版本怎么选；第三，你所在城市的费用应该怎么拆。\n\n没有提问的朋友也可以继续听，我会用“结论→原因→适合谁→怎么买”的顺序讲，尽量让每个话题都能单独听懂。`);
+ s+=section('收尾与下一轮衔接',`最后再总结一下：选车先看需求，选版本看高频配置，谈价格一定比较同口径总成本。${m}不要因为一个低价数字就直接做决定。\n\n下一轮我继续讲大家问得最多的车型对比。新进来的把预算和车型打在公屏，咱们直接接着往下聊。`);
+ $('out').textContent=s;$('count').textContent=s.length+' 字';
+}
+function copyText(){navigator.clipboard.writeText($('out').innerText).then(()=>{const x=event.target;x.textContent='已复制';setTimeout(()=>x.textContent='复制全文',1200)})}
+function resetAll(){['brand','model','topic','facts'].forEach(x=>$(x).value='');$('out').innerHTML='<div class="hint">填写左侧信息后点击“生成直播稿”</div>';$('count').textContent='0 字'}
+</script></body></html>
